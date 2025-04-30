@@ -1,18 +1,18 @@
 class Account:
 
-    def __init__(self, name, balance=0):
+    def __init__(self, name: str , balance: float = 0.0) -> None:
         self.__account_name = name
         self.__account_balance = balance
         self.set_balance(self.get_balance())
 
-    def deposit(self, amount):
+    def deposit(self, amount: float) -> bool:
         if amount <= 0:
             return False
         else:
             self.set_balance(self.get_balance() + amount)
             return True
 
-    def withdraw(self, amount):
+    def withdraw(self, amount: float) -> bool:
         if amount <= 0:
             return False
         elif amount > self.get_balance():
@@ -21,22 +21,22 @@ class Account:
             self.set_balance(self.get_balance() - amount)
             return True
 
-    def get_balance(self):
+    def get_balance(self) -> float:
         return self.__account_balance
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.__account_name
 
-    def set_balance(self, value):
+    def set_balance(self, value: float) -> None:
         if value < 0:
             self.__account_balance = 0
         else:
             self.__account_balance = value
 
-    def set_name(self, value):
+    def set_name(self, value: float) -> None:
         self.__account_name = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Account name = {self.get_name()}, Account balance = {self.get_balance():.2f}'
 
 
