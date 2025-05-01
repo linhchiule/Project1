@@ -1,5 +1,5 @@
 firstname,lastname,pin,balance
-Bob,Martinez,5113,300.00
+Bob,Martinez,5113,100.00
 Frank,Jones,2635,6899.01
 Thomas,Moore,9372,9754.99
 Grace,Hernandez,194,882.82
@@ -39,9 +39,9 @@ Irene,Gonzalez,7330,8836.7
 Monica,Johnson,8480,2366.35
 Emma,Robinson,4783,1336.4
 Carol,Gonzalez,8988,6221.91
-Olivia,Perez,448,8711.32
+Olivia,Perez,4488,8711.32
 Zach,Clark,2221,6822.28
-Ursula,Thomas,265,5157.52
+Ursula,Thomas,2650,5157.52
 Irene,Lee,7977,4980.73
 Thomas,Clark,5841,1339.34
 Yolanda,Smith,1355,7407.46
@@ -49,9 +49,4 @@ Susan,Rodriguez,5156,7013.23
 Ursula,Robinson,3442,4966.32
 Yolanda,Jackson,8662,710.02
 John,Rodriguez,2129,2413.53
-Linh,Le,1111,5533.44
-Anh,Ta,1111,0.00
-Anh,Anh,1111,30.00
-Anh,Anh,1112,0.00
-Haha,Haha,1111,50.00
-Anh,Ta,1234,50.00
+

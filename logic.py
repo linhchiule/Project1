@@ -11,7 +11,7 @@ class Logic(QMainWindow, Ui_Welcome):
         self.setupUi(self)
         self.button_login.clicked.connect(self.login)
         self.button_enter.clicked.connect(self.enter)
-        self.button_exit.clicked.connect(self.exit)
+        self.button_exit.clicked.connect(self.logout)
         self.button_signup.clicked.connect(self.signup)
 
         # Hide everything except the login form
@@ -90,30 +90,30 @@ class Logic(QMainWindow, Ui_Welcome):
         This method is used to sign up for a new customer account.
         """
 
-        # Hide everything except the signup form and change label for signup form
-        self.label_firstname.setText('First name *')
-        self.label_lastname.setText('Last name *')
-        self.label_enterpin.setText('Set a new PIN *')
-        self.label_reenterpin.show()
-        self.label_enterpin.setText('Enter new PIN *')
-        self.entry_reenterpin.show()
-        self.button_login.hide()
-        self.label_startmessage.hide()
-        self.button_enter.hide()
-        self.button_exit.hide()
-        self.button_withdraw.hide()
-        self.button_deposit.hide()
-        self.entry_amount.hide()
-        self.label_amount.hide()
-        self.label_accountbalance.hide()
+        # Hide everything except the signup form and change label for signup form. Make sure the form is in sign-in mode
+        if not self.entry_reenterpin.isVisible():
+            self.label_firstname.setText('First name *')
+            self.label_lastname.setText('Last name *')
+            self.label_enterpin.setText('Set a new PIN *')
+            self.label_reenterpin.show()
+            self.entry_reenterpin.show()
+            self.button_login.hide()
+            self.label_startmessage.hide()
+            self.button_enter.hide()
+            self.button_exit.hide()
+            self.button_withdraw.hide()
+            self.button_deposit.hide()
+            self.entry_amount.hide()
+            self.label_amount.hide()
+            self.label_accountbalance.hide()
+            return
 
-        #Validate: All fields required
         first_name = self.entry_firstname.text().strip()
         last_name = self.entry_lastname.text().strip()
         pin = self.entry_enterpin.text().strip()
         repin = self.entry_reenterpin.text().strip()
 
-
+        # Validate: All fields required
         if first_name == "" or last_name == "" or pin =="":
             self.label_startmessage.show()
             self.label_startmessage.setStyleSheet("color: red;")
@@ -146,17 +146,23 @@ class Logic(QMainWindow, Ui_Welcome):
             self.label_startmessage.show()
             self.label_startmessage.setStyleSheet("color: red;")
             self.label_startmessage.setText("First letters should be capitalized.")
+            return
 
         #After validation,create a new account and notify customers to login.
         self.user_firstname = first_name
         self.user_lastname = last_name
         self.user_pin = pin
-        self.user_accountbalance = 0.00
         fullname = f'{first_name} {last_name}'
-        self.account = Account(fullname, self.user_accountbalance)
+        self.account = Account(fullname, 0.00)
 
         # After validation, update info to the customer database.
-        self.updatedata()
+        try:
+            self.updatedata()
+        except Exception as e:
+            print ("Error writing new account:", e)
+            self.label_startmessage.setStyleSheet("color: red;")
+            self.label_startmessage.setText("Could not create account. Try again.")
+            return
 
         # Set up the new login form
         for w in (self.label_firstname, self.label_lastname,
@@ -166,27 +172,21 @@ class Logic(QMainWindow, Ui_Welcome):
                   self.button_signup):
             w.show()
 
-        for w in (
-                    self.button_enter,self.button_exit,
-                    self.button_withdraw,self.button_deposit,
-                    self.entry_amount,self.label_amount,
-                    self.label_accountbalance,self.label_reenterpin,
-                    self.entry_reenterpin):
-                w.hide()
+        for w in (self.button_enter, self.button_exit, self.button_withdraw,
+                  self.button_deposit, self.entry_amount, self.label_amount,
+                  self.label_accountbalance, self.label_reenterpin, self.entry_reenterpin):
+            w.hide()
 
-        for i in (self.entry_firstname, self.entry_lastname, self.entry_enterpin):
-            i.clear()
+        # Clear every input field:
+        self.entry_firstname.clear()
+        self.entry_lastname.clear()
+        self.entry_enterpin.clear()
 
-        self.label_startmessage.show()
         self.label_startmessage.setStyleSheet("color: blue;")
         self.label_startmessage.setText(f"Account created! Please log in.")
         self.label_firstname.setText("First name")
         self.label_lastname.setText("Last name")
         self.label_enterpin.setText("Enter PIN")
-
-        # After validation, update info to the customer database.
-        self.updatedata()
-
 
 
     def enter(self) -> None:
@@ -239,18 +239,24 @@ class Logic(QMainWindow, Ui_Welcome):
         """
 
         # Load the data
-        with open('customer.csv', newline='') as csvfile:
-            reader = csv.reader(csvfile)
-            rows = list(reader)
+        try:
+            with open('customer.csv', newline='') as csvfile:
+                reader = csv.reader(csvfile)
+                rows = list(reader)
+            #Identify headers and data rows
+            header, data_rows = rows[0], rows[1:]
+            data_rows = [row for row in data_rows if len(row) == 4]
 
-        # Identify headers and data rows
-        header, data_rows = rows[0], rows[1:]
+        except (FileNotFoundError, IndexError):
+            # No file yet, or file has no header + rows
+            header = ['firstname', 'lastname', 'pin', 'balance']
+            data_rows = []
 
         # Find & update an existing customer
         found = False
         for row in data_rows:
             fn,ln, p, b = row
-            if (fn == self.user_firstname and ln == self.user_lastname and p == self.user_pin):
+            if fn == self.user_firstname and ln == self.user_lastname and p == self.user_pin:
                 row[3] = f'{self.account.get_balance():.2f}'
                 found = True
                 break  #stop once updated
@@ -265,7 +271,7 @@ class Logic(QMainWindow, Ui_Welcome):
             writer.writerow(header)
             writer.writerows(data_rows)
 
-    def exit(self) -> None:
+    def logout(self) -> None:
         """
         Clear all forms and reset the interface back to login state.
         """
@@ -296,7 +302,6 @@ class Logic(QMainWindow, Ui_Welcome):
             self.label_amount,
             self.label_accountbalance,
             self.label_reenterpin,
-            self.entry_reenterpin
-        ):
+            self.entry_reenterpin):
             w.hide()
 

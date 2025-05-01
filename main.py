@@ -1,8 +1,13 @@
 
-# main.py
+
+import faulthandler
+faulthandler.enable()
 import sys
 from PyQt6.QtWidgets import QApplication
 from logic import *
+
+import faulthandler
+faulthandler.enable()
 
 def main():
     app = QApplication(sys.argv)
